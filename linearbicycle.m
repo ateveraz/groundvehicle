@@ -31,10 +31,10 @@ classdef linearbicycle < matlab.System
             obj.computeInputMatrix();
         end
 
-        function [fx, ay] = stepImpl(obj, Vx, delta, x)
-            obj.computeStateMatrix(Vx);
+        function [fx, ay] = stepImpl(obj, u, delta, x)
+            obj.computeStateMatrix(u);
             fx = obj.A * x + obj.B * delta;
-            ay = fx(1) + x(2) * Vx;
+            ay = fx(1) + x(2) * u;
         end
 
         function resetImpl(~)
@@ -66,17 +66,21 @@ classdef linearbicycle < matlab.System
             ay = true;
         end
 
-        function obj = computeStateMatrix(obj, Vx)
+        function obj = computeStateMatrix(obj, u)
             % Compute the state matrix A based on vehicle parameters
-            obj.A(1,1) = -(obj.Cf + obj.Cr)/obj.mu;
-            obj.A(1,2) =  (obj.lr*obj.Cr - obj.lf*obj.Cf)/obj.mu - Vx;
-            obj.A(2,1) =  (obj.lr*obj.Cr - obj.lf*obj.Cf)/(obj.Iz*Vx);
-            obj.A(2,2) = -(obj.lf^2*obj.Cf + obj.lr^2*obj.Cr)/(obj.Iz*Vx);
+            if u == 0
+                obj.A = zeros(2,2);
+                return;
+            end
+            obj.A(1,1) = -(obj.Cf + obj.Cr)/(obj.m * u);
+            obj.A(1,2) =  (obj.lr*obj.Cr - obj.lf*obj.Cf)/(obj.m * u) - u;
+            obj.A(2,1) =  (obj.lr*obj.Cr - obj.lf*obj.Cf)/(obj.Iz * u);
+            obj.A(2,2) = -(obj.lf^2*obj.Cf + obj.lr^2*obj.Cr)/(obj.Iz * u);
         end
 
         function obj = computeInputMatrix(obj)
             % Compute the input matrix B based on vehicle parameters
-            obj.B(1,1) = obj.Cf/obj.mu;
+            obj.B(1,1) = obj.Cf/obj.m;
             obj.B(2,1) = (obj.lf*obj.Cf)/obj.Iz;
         end
     end
