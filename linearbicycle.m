@@ -6,6 +6,11 @@ classdef linearbicycle < matlab.System
 
     % Public, tunable properties
     properties (Access = public)
+        % Vehicle parameters
+        vehicleParams; % Struct containing vehicle parameters
+    end
+
+    properties (Access = private)
         Cf = 160000; % Front cornering stiffness [N/rad]
         Cr = 170000; % Rear cornering stiffness [N/rad]
         lf = 1.2;    % Distance from CG to front axle [m]
@@ -29,6 +34,14 @@ classdef linearbicycle < matlab.System
             obj.B = zeros(2,1);
 
             obj.computeInputMatrix();
+
+            obj.Cf = obj.vehicleParams.Cf;
+            obj.Cr = obj.vehicleParams.Cr;
+            obj.lf = obj.vehicleParams.lf;
+            obj.lr = obj.vehicleParams.lr;
+            obj.m = obj.vehicleParams.m;
+            obj.Iz = obj.vehicleParams.Iz;
+            obj.mu = obj.vehicleParams.mu;
         end
 
         function [fx, ay] = stepImpl(obj, u, delta, x)

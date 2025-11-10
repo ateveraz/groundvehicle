@@ -4,8 +4,7 @@ classdef linearbicycleStability < matlab.System
     % This template includes the minimum set of functions required
     % to define a System object.
 
-    % Public, tunable properties
-    properties (Access = public)
+    properties (Access = private)
         Cf = 160000; % Front cornering stiffness [N/rad]
         Cr = 170000; % Rear cornering stiffness [N/rad]
         lf = 1.2;    % Distance from CG to front axle [m]
@@ -31,9 +30,19 @@ classdef linearbicycleStability < matlab.System
             obj.B_Mz = zeros(2,1);
 
             obj.computeInputMatrix();
+
+            modelParameters = evalin('base', 'model');
+
+            obj.Cf = modelParameters.Cf;
+            obj.Cr = modelParameters.Cr;
+            obj.lf = modelParameters.lf;
+            obj.lr = modelParameters.lr;
+            obj.m  = modelParameters.m;
+            obj.Iz = modelParameters.Iz;
+            obj.mu = modelParameters.mu;
         end
 
-        function [fx, ay] = stepImpl(obj, Vx, delta, Mz, x)
+        function [ay, fx] = stepImpl(obj, Vx, delta, Mz, x)
             obj.computeStateMatrix(Vx);
             fx = obj.A * x + obj.B_delta * delta + obj.B_Mz * Mz;
             ay = fx(1) + x(2) * Vx;
@@ -44,28 +53,28 @@ classdef linearbicycleStability < matlab.System
         end
 
         % Functions to declare outputs
-        function [fx, ay] = getOutputSizeImpl(~)
+        function [ay, fx] = getOutputSizeImpl(~)
             % Return size for each output port
-            fx = [2 1];
             ay = [1 1];
+            fx = [2 1];
         end
 
-        function [fx, ay] = getOutputDataTypeImpl(~)
+        function [ay, fx] = getOutputDataTypeImpl(~)
             % Return data type for each output port
-            fx = 'double';
             ay = 'double';
+            fx = 'double';
         end
 
-        function [fx, ay] = isOutputComplexImpl(~)
+        function [ay, fx] = isOutputComplexImpl(~)
             % Return true for each output port with complex data
-            fx = false;
             ay = false;
+            fx = false;
         end
 
-        function [fx, ay] = isOutputFixedSizeImpl(~)
+        function [ay, fx] = isOutputFixedSizeImpl(~)
             % Return true if each output port has a fixed size
-            fx = true;
             ay = true;
+            fx = true;
         end
 
         function obj = computeStateMatrix(obj, u)
