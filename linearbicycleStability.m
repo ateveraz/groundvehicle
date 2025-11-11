@@ -9,7 +9,7 @@ classdef linearbicycleStability < matlab.System
         Cr = 170000; % Rear cornering stiffness [N/rad]
         lf = 1.2;    % Distance from CG to front axle [m]
         lr = 1.6;    % Distance from CG to rear axle [m]
-        m = 1500;    % Vehicle mass [kg]
+        m = 3000;    % Vehicle mass [kg]
         Iz = 2250;   % Yaw moment of inertia [kg*m^2]
         mu = 0.01;   % Tire-road friction coefficient
     end
@@ -29,8 +29,6 @@ classdef linearbicycleStability < matlab.System
             obj.B_delta = zeros(2,1);
             obj.B_Mz = zeros(2,1);
 
-            obj.computeInputMatrix();
-
             modelParameters = evalin('base', 'model');
 
             obj.Cf = modelParameters.Cf;
@@ -40,6 +38,8 @@ classdef linearbicycleStability < matlab.System
             obj.m  = modelParameters.m;
             obj.Iz = modelParameters.Iz;
             obj.mu = modelParameters.mu;
+
+            obj.computeInputMatrix();
         end
 
         function [ay, fx] = stepImpl(obj, Vx, delta, Mz, x)
