@@ -65,7 +65,7 @@ classdef VSC < matlab.System
     methods (Access = private)
         function r_desired = compute_r_desired(obj, Vx, delta)
             % Avoid division by zero at standstill
-            if Vx < 0.5
+            if Vx < 0.01
                 r_desired = 0;
                 return;
             end
@@ -90,7 +90,7 @@ classdef VSC < matlab.System
             % a_y_max = r * Vx  (at steady state)
             % So, r_max = (mu * g) / Vx
             % (Based on R047017_2025_lecture06.pdf, p. 25)
-            r_limit = (obj.mu * obj.gravity) / Vx;
+            r_limit = 0.85 * (obj.mu * obj.gravity) / Vx;
 
             % The final reference cannot ask for more than is physically possible.
             r_desired = max(-r_limit, min(r_limit, r_unlimited));
